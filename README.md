@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# com·passion 🧺
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website thương mại xã hội — bán giỏ đan tay từ bà con vùng cao, kể câu chuyện đằng sau
+mỗi sản phẩm, và minh bạch dòng tiền hỗ trợ các em nhỏ tới trường.
 
-Currently, two official plugins are available:
+> Mỗi chiếc giỏ là một câu chuyện.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Chạy dự án
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # chạy dev server
+npm run build    # build production (đã type-check sạch)
+npm run preview  # xem thử bản build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Tech: **React 19 + TypeScript + Vite + React Router**. Trạng thái (giỏ hàng, tài khoản)
+lưu tạm trong `localStorage` — chưa cần backend để xem toàn bộ giao diện.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Tông màu & phong cách
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Xanh lá cây (chủ đạo) + cam ấm / vàng đất.
+- Tối giản, nhiều khoảng thở, bo góc mềm.
+- Tokens trong [`src/index.css`](src/index.css), components trong [`src/components.css`](src/components.css).
+
+## Cấu trúc trang
+
+| Trang | Đường dẫn | Mô tả |
+|------|-----------|------|
+| Trang chủ | `/` | Sứ mệnh · impact (số liệu động) · sản phẩm nổi bật · câu chuyện · **sắp ra mắt** · newsletter |
+| Sản phẩm | `/shop` | Lọc theo loại, sắp xếp theo giá |
+| Chi tiết SP | `/san-pham/:slug` | Giá, mô tả, câu chuyện người làm ra |
+| Câu chuyện | `/cau-chuyen` | Nghệ nhân + các em nhỏ ở trường |
+| Chi tiết câu chuyện | `/cau-chuyen/:slug` | Bài viết đầy đủ + sản phẩm liên quan |
+| Minh bạch | `/minh-bach` | Hoá đơn + báo cáo định kỳ, biểu đồ phân bổ dòng tiền |
+| Giỏ hàng | `/gio-hang` | **Donate thêm khi checkout**, xác nhận đơn |
+| Đăng nhập | `/dang-nhap` | Google (giả lập) hoặc email |
+| Tài khoản | `/tai-khoan` | Lịch sử đơn, tổng đóng góp, **huy hiệu** |
+
+Dữ liệu mẫu nằm trong [`src/data/`](src/data/) — sửa ở đây để đổi sản phẩm/câu chuyện/báo cáo.
+
+## ⚠️ Những phần cần backend / xử lý thêm (note lại cho bạn)
+
+Mình đã làm trọn vẹn phần giao diện (frontend). Các hạng mục dưới đây **cần dịch vụ
+backend / bên thứ ba** nên hiện đang ở dạng demo, đã đánh dấu `TODO(backend)` trong code:
+
+1. **Đăng nhập Google thật** — `src/pages/Login.tsx`. Cần Google OAuth Client ID + một
+   backend (hoặc Firebase/Supabase Auth) để xác thực. Hiện đang đăng nhập giả lập, lưu `localStorage`.
+2. **Thanh toán thật** — `src/pages/Cart.tsx`. Cần tích hợp cổng (VNPay / Momo / Stripe).
+   Hiện checkout chỉ tạo đơn mẫu.
+3. **Tài khoản & đơn hàng bền vững** — đang lưu `localStorage`. Cần database thật để
+   theo dõi hành trình người dùng qua nhiều thiết bị.
+4. **Gửi newsletter đầu tháng** — `src/components/NewsletterSignup.tsx`. Cần dịch vụ email
+   (Mailchimp / Resend / Sendgrid) + lưu danh sách đăng ký.
+5. **Hoá đơn / sao kê PDF** — `src/pages/Transparency.tsx`. Đang là nút demo; cần upload
+   và liên kết file thật.
+6. **Ảnh thật** — hiện dùng ảnh minh hoạ (gradient + emoji). Mỗi ảnh cần chụp có ghi chú
+   trong `realPhotoNote` (xem `src/data/*.ts`), ví dụ:
+   - Cô H'Lan đang đan mây trước hiên, ánh sáng sáng sớm.
+   - Chú Tư bên gánh hàng rong buổi đêm, đèn vàng ấm.
+   - Các em nhỏ 8–10 tuổi vùng cao đang ăn trưa ở trường.
+   Thay `art` bằng đường dẫn ảnh và cập nhật component [`Photo`](src/components/Photo.tsx).
+
+### Quyết định cần bạn xác nhận
+- **Nội dung & số liệu** hiện là mẫu (tên cô chú, số tiền, báo cáo). Cần thay bằng dữ liệu thật.
+- **Triển khai**: vì dùng React Router, khi deploy tĩnh (Netlify/Vercel) cần bật SPA fallback
+  (rewrite mọi route về `index.html`).

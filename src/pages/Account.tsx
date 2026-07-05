@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, badgeFor } from '../context/AuthContext';
-import { formatVND } from '../data/products';
+import { formatVND } from '../data/types';
+import { Loading } from '../components/Status';
 
 const allBadges = [
   { name: 'Hạt giống', emoji: '🌱', tier: 1, at: 'Đơn hàng đầu tiên' },
@@ -9,8 +11,22 @@ const allBadges = [
 ];
 
 export default function Account() {
-  const { user, logout, totalContribution } = useAuth();
+  const { user, loading, logout, refresh, totalContribution } = useAuth();
   const navigate = useNavigate();
+
+  // Làm mới đơn hàng mỗi khi vào trang.
+  useEffect(() => {
+    if (user) void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="section section--top container">
+        <Loading label="Đang khôi phục phiên đăng nhập…" />
+      </section>
+    );
+  }
 
   if (!user) {
     return (
@@ -19,7 +35,7 @@ export default function Account() {
           <span className="empty__emoji">👤</span>
           <h1>Bạn chưa đăng nhập</h1>
           <p className="muted">Đăng nhập để theo dõi hành trình đóng góp của mình.</p>
-          <Link to="/dang-nhap" className="btn btn--accent">Đăng nhập</Link>
+          <Link to="/dang-nhap" className="btn btn--accent">Đăng nhập với Google</Link>
         </div>
       </section>
     );
@@ -33,7 +49,17 @@ export default function Account() {
       <div className="container">
         <div className="account__head card">
           <div className="account__id">
-            <span className="account__avatar">{user.name.charAt(0).toUpperCase()}</span>
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt=""
+                className="account__avatar"
+                style={{ objectFit: 'cover', borderRadius: '50%' }}
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <span className="account__avatar">{user.name.charAt(0).toUpperCase()}</span>
+            )}
             <div>
               <h1>Chào {user.name} 👋</h1>
               <p className="muted">{user.email}</p>

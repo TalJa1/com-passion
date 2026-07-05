@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Product } from '../data/types';
-import { formatVND } from '../data/products';
+import { formatVND, type Product } from '../data/types';
 import { useCart } from '../context/CartContext';
 import Photo from './Photo';
 

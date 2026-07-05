@@ -1,23 +1,30 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
+import { errorMessage } from '../lib/api';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(name || 'Người bạn mới', email || 'ban@compassion.vn');
-    navigate('/tai-khoan');
-  };
-
-  const googleMock = () => {
-    // TODO(backend): Google OAuth thật cần Client ID + backend xác thực. Xem README.
-    login('Minh Anh', 'minhanh@gmail.com');
-    navigate('/tai-khoan');
+  const handleCredential = async (credential?: string) => {
+    if (!credential) {
+      setError('Không nhận được thông tin đăng nhập từ Google. Vui lòng thử lại.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/tai-khoan');
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -27,29 +34,20 @@ export default function Login() {
           <span className="brand__mark auth__mark" aria-hidden="true">🧺</span>
           <h1>Đồng hành cùng dự án</h1>
           <p className="muted">
-            Tạo tài khoản để theo dõi hành trình của bạn — lịch sử đơn hàng, tổng đóng góp
-            và những huy hiệu ấm áp.
+            Đăng nhập bằng Google để theo dõi hành trình của bạn — lịch sử đơn hàng, tổng đóng góp
+            và những huy hiệu ấm áp. Tài khoản được tạo tự động ở lần đăng nhập đầu tiên.
           </p>
 
-          <button className="btn btn--light btn--block google" onClick={googleMock}>
-            <span aria-hidden="true">🟦</span> Tiếp tục với Google
-          </button>
+          <div className="auth__google" style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
+            <GoogleLogin
+              onSuccess={(res) => handleCredential(res.credential)}
+              onError={() => setError('Đăng nhập Google thất bại. Vui lòng thử lại.')}
+              text="continue_with"
+            />
+          </div>
 
-          <div className="auth__divider"><span>hoặc</span></div>
-
-          <form className="auth__form" onSubmit={submit}>
-            <div className="field">
-              <label htmlFor="name">Tên của bạn</label>
-              <input id="name" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" />
-            </div>
-            <div className="field">
-              <label htmlFor="email">Email</label>
-              <input id="email" className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@cua-ban.com" />
-            </div>
-            <button className="btn btn--accent btn--block" type="submit">Tạo tài khoản / Đăng nhập</button>
-          </form>
-
-          <p className="muted auth__note">Demo đăng nhập — dữ liệu lưu tạm trên trình duyệt.</p>
+          {busy && <p className="muted">Đang đăng nhập…</p>}
+          {error && <p className="auth__error" style={{ color: '#c0392b' }} role="alert">{error}</p>}
         </div>
       </div>
     </section>

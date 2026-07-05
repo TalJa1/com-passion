@@ -1,16 +1,19 @@
 import { Link } from 'react-router-dom';
-import { products } from '../data/products';
-import { stories } from '../data/stories';
-import { impactStats, upcoming } from '../data/impact';
+import { api } from '../lib/api';
+import { useApi } from '../lib/useApi';
 import ProductCard from '../components/ProductCard';
 import CountUp from '../components/CountUp';
 import Photo from '../components/Photo';
+import { Loading, ErrorNote } from '../components/Status';
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 export default function Home() {
-  const featured = products.filter((p) => p.featured);
+  const featuredState = useApi(() => api.products({ featured: true }));
+  const storiesState = useApi(() => api.stories());
+  const statsState = useApi(() => api.impactStats());
+  const upcomingState = useApi(() => api.upcoming());
 
   return (
     <>
@@ -84,17 +87,21 @@ export default function Home() {
             <span className="eyebrow" style={{ color: 'var(--sand-400)' }}>Dấu ấn dự án</span>
             <h2 style={{ color: '#fff' }}>Những con số biết nói</h2>
           </div>
-          <div className="impact__grid">
-            {impactStats.map((s) => (
-              <div key={s.key} className="impact__stat">
-                <span className="impact__emoji">{s.emoji}</span>
-                <span className="impact__value">
-                  <CountUp to={s.value} prefix={s.prefix} suffix={s.suffix} />
-                </span>
-                <span className="impact__label">{s.label}</span>
-              </div>
-            ))}
-          </div>
+          {statsState.loading && <Loading />}
+          {statsState.error && <ErrorNote message={statsState.error} />}
+          {statsState.data && (
+            <div className="impact__grid">
+              {statsState.data.map((s) => (
+                <div key={s.key} className="impact__stat">
+                  <span className="impact__emoji">{s.emoji}</span>
+                  <span className="impact__value">
+                    <CountUp to={s.value} prefix={s.prefix} suffix={s.suffix} />
+                  </span>
+                  <span className="impact__label">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <p className="impact__note">
             <Link to="/minh-bach" className="btn btn--light">Xem hoá đơn & báo cáo →</Link>
           </p>
@@ -111,11 +118,15 @@ export default function Home() {
             </div>
             <Link to="/shop" className="btn btn--ghost">Tất cả sản phẩm →</Link>
           </div>
-          <div className="grid cols-3">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {featuredState.loading && <Loading />}
+          {featuredState.error && <ErrorNote message={featuredState.error} />}
+          {featuredState.data && (
+            <div className="grid cols-3">
+              {featuredState.data.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -126,21 +137,25 @@ export default function Home() {
             <span className="eyebrow">Người làm ra sản phẩm</span>
             <h2>Đằng sau mỗi chiếc giỏ là một con người</h2>
           </div>
-          <div className="grid cols-3">
-            {stories.map((s) => (
-              <Link key={s.id} to={`/cau-chuyen/${s.slug}`} className="story-card">
-                <Photo art={s.art} ratio="4 / 3" />
-                <div className="story-card__body">
-                  <span className={`chip ${s.kind === 'school' ? 'chip--clay' : 'chip--green'}`}>
-                    {s.kind === 'school' ? 'Các em nhỏ' : 'Nghệ nhân'}
-                  </span>
-                  <h3>{s.title}</h3>
-                  <p className="muted">{s.excerpt}</p>
-                  <span className="story-card__more">Đọc tiếp →</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {storiesState.loading && <Loading />}
+          {storiesState.error && <ErrorNote message={storiesState.error} />}
+          {storiesState.data && (
+            <div className="grid cols-3">
+              {storiesState.data.map((s) => (
+                <Link key={s.id} to={`/cau-chuyen/${s.slug}`} className="story-card">
+                  <Photo art={s.art} ratio="4 / 3" />
+                  <div className="story-card__body">
+                    <span className={`chip ${s.kind === 'school' ? 'chip--clay' : 'chip--green'}`}>
+                      {s.kind === 'school' ? 'Các em nhỏ' : 'Nghệ nhân'}
+                    </span>
+                    <h3>{s.title}</h3>
+                    <p className="muted">{s.excerpt}</p>
+                    <span className="story-card__more">Đọc tiếp →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -151,20 +166,24 @@ export default function Home() {
             <span className="eyebrow">Sắp ra mắt</span>
             <h2>Những điều đang tới</h2>
           </div>
-          <div className="upcoming__list">
-            {upcoming.map((u) => (
-              <div key={u.id} className="upcoming__item card">
-                <div className="upcoming__art" style={{ background: `linear-gradient(135deg, ${u.art.from}, ${u.art.to})` }}>
-                  <span>{u.art.emoji}</span>
+          {upcomingState.loading && <Loading />}
+          {upcomingState.error && <ErrorNote message={upcomingState.error} />}
+          {upcomingState.data && (
+            <div className="upcoming__list">
+              {upcomingState.data.map((u) => (
+                <div key={u.id} className="upcoming__item card">
+                  <div className="upcoming__art" style={{ background: `linear-gradient(135deg, ${u.art.from}, ${u.art.to})` }}>
+                    <span>{u.art.emoji}</span>
+                  </div>
+                  <div className="upcoming__info">
+                    <span className="chip chip--green">Bắt đầu {formatDate(u.startDate)}</span>
+                    <h3>{u.title}</h3>
+                    <p className="muted">{u.note}</p>
+                  </div>
                 </div>
-                <div className="upcoming__info">
-                  <span className="chip chip--green">Bắt đầu {formatDate(u.startDate)}</span>
-                  <h3>{u.title}</h3>
-                  <p className="muted">{u.note}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

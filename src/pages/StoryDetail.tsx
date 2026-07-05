@@ -1,12 +1,44 @@
 import { Link, useParams } from 'react-router-dom';
-import { getStory, stories } from '../data/stories';
-import { products } from '../data/products';
+import { api, ApiError } from '../lib/api';
+import { useApi } from '../lib/useApi';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
+import { Loading, ErrorNote } from '../components/Status';
 
 export default function StoryDetail() {
   const { slug } = useParams();
-  const story = slug ? getStory(slug) : undefined;
+
+  const { data: story, loading, error } = useApi(
+    async () => {
+      try {
+        return await api.story(slug!);
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 404) return null;
+        throw err;
+      }
+    },
+    [slug]
+  );
+
+  const { data: allStories } = useApi(() => api.stories());
+  const { data: allProducts } = useApi(() => api.products());
+
+  if (loading) {
+    return (
+      <section className="section section--top container">
+        <Loading />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="section container">
+        <ErrorNote message={error} />
+        <Link to="/cau-chuyen" className="btn btn--ghost">← Về trang câu chuyện</Link>
+      </section>
+    );
+  }
 
   if (!story) {
     return (
@@ -17,8 +49,8 @@ export default function StoryDetail() {
     );
   }
 
-  const related = products.filter((p) => p.storySlug === story.slug);
-  const others = stories.filter((s) => s.slug !== story.slug);
+  const related = (allProducts ?? []).filter((p) => p.storySlug === story.slug);
+  const others = (allStories ?? []).filter((s) => s.slug !== story.slug);
 
   return (
     <article>
@@ -65,23 +97,25 @@ export default function StoryDetail() {
         </section>
       )}
 
-      <section className="section story-more">
-        <div className="container">
-          <div className="section-head"><h2>Câu chuyện khác</h2></div>
-          <div className="grid cols-2">
-            {others.map((s) => (
-              <Link key={s.id} to={`/cau-chuyen/${s.slug}`} className="story-card story-card--row">
-                <Photo art={s.art} ratio="1 / 1" className="story-card__thumb" />
-                <div className="story-card__body">
-                  <h3>{s.title}</h3>
-                  <p className="muted">{s.excerpt}</p>
-                  <span className="story-card__more">Đọc tiếp →</span>
-                </div>
-              </Link>
-            ))}
+      {others.length > 0 && (
+        <section className="section story-more">
+          <div className="container">
+            <div className="section-head"><h2>Câu chuyện khác</h2></div>
+            <div className="grid cols-2">
+              {others.map((s) => (
+                <Link key={s.id} to={`/cau-chuyen/${s.slug}`} className="story-card story-card--row">
+                  <Photo art={s.art} ratio="1 / 1" className="story-card__thumb" />
+                  <div className="story-card__body">
+                    <h3>{s.title}</h3>
+                    <p className="muted">{s.excerpt}</p>
+                    <span className="story-card__more">Đọc tiếp →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </article>
   );
 }

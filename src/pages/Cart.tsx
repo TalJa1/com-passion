@@ -1,37 +1,58 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useCart } from '../context/CartContext';
-import { useAuth, type Order } from '../context/AuthContext';
-import { formatVND } from '../data/products';
+import { useAuth } from '../context/AuthContext';
+import { api, errorMessage } from '../lib/api';
+import { formatVND, type Order } from '../data/types';
 import Photo from '../components/Photo';
 
 const donationOptions = [0, 10000, 20000, 50000];
 
 export default function Cart() {
   const { lines, subtotal, setQty, remove, clear } = useCart();
-  const { user, addOrder } = useAuth();
+  const { user, refresh, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [donation, setDonation] = useState(10000);
   const [custom, setCustom] = useState('');
   const [placed, setPlaced] = useState<Order | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const donateValue = custom ? Math.max(0, Number(custom) || 0) : donation;
   const total = subtotal + donateValue;
 
-  const checkout = () => {
-    const order: Order = {
-      id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-      date: new Date().toISOString().slice(0, 10),
-      items: lines.map((l) => ({ name: l.product.name, qty: l.qty, price: l.product.price })),
-      donation: donateValue,
-      total,
-    };
-    // TODO(backend): tích hợp cổng thanh toán thật (VNPay/Momo/Stripe...).
-    if (user) addOrder(order);
-    clear();
-    setPlaced(order);
-    window.scrollTo({ top: 0 });
+  const checkout = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const order = await api.createOrder({
+        items: lines.map((l) => ({ productId: l.product.id, qty: l.qty })),
+        donation: donateValue,
+      });
+      clear();
+      setPlaced(order);
+      void refresh();
+      window.scrollTo({ top: 0 });
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoogle = async (credential?: string) => {
+    if (!credential) {
+      setError('Không nhận được thông tin đăng nhập từ Google. Vui lòng thử lại.');
+      return;
+    }
+    setError(null);
+    try {
+      await loginWithGoogle(credential);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
   };
 
   if (placed) {
@@ -47,11 +68,7 @@ export default function Cart() {
           <p className="muted">Tổng cộng: {formatVND(placed.total)}</p>
           <div className="confirm__cta">
             <Link to="/shop" className="btn btn--accent">Tiếp tục mua sắm</Link>
-            {user ? (
-              <Link to="/tai-khoan" className="btn btn--ghost">Xem hành trình của tôi</Link>
-            ) : (
-              <Link to="/dang-nhap" className="btn btn--ghost">Tạo tài khoản để lưu đơn</Link>
-            )}
+            <Link to="/tai-khoan" className="btn btn--ghost">Xem hành trình của tôi</Link>
           </div>
         </div>
       </section>
@@ -128,13 +145,28 @@ export default function Cart() {
               <div className="summary__total"><dt>Tổng cộng</dt><dd>{formatVND(total)}</dd></div>
             </dl>
 
-            <button className="btn btn--accent btn--block btn--lg" onClick={checkout}>
-              Thanh toán
-            </button>
+            {user ? (
+              <button className="btn btn--accent btn--block btn--lg" onClick={checkout} disabled={submitting}>
+                {submitting ? 'Đang xử lý…' : 'Thanh toán'}
+              </button>
+            ) : (
+              <div className="cart__login">
+                <p className="muted">Vui lòng đăng nhập bằng Google để thanh toán:</p>
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}>
+                  <GoogleLogin
+                    onSuccess={(res) => handleGoogle(res.credential)}
+                    onError={() => setError('Đăng nhập Google thất bại. Vui lòng thử lại.')}
+                    text="continue_with"
+                  />
+                </div>
+              </div>
+            )}
+
+            {error && <p role="alert" style={{ color: '#c0392b' }}>⚠️ {error}</p>}
+
             <button className="btn btn--ghost btn--block" onClick={() => navigate('/shop')}>
               Tiếp tục mua sắm
             </button>
-            <p className="muted summary__note">🔒 Demo — chưa tích hợp thanh toán thật.</p>
           </aside>
         </div>
       </div>

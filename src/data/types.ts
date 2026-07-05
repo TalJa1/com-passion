@@ -69,3 +69,38 @@ export interface UpcomingProject {
   note: string;
   art: Art;
 }
+
+export interface OrderItem {
+  name: string;
+  qty: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  date: string; // ISO
+  items: OrderItem[];
+  donation: number;
+  total: number;
+}
+
+export interface User {
+  name: string;
+  email: string;
+  avatar?: string;
+  orders: Order[];
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  tokenType: string;
+  user: User;
+}
+
+export interface OrderCreate {
+  items: { productId: string; qty: number }[];
+  donation: number;
+}
+
+export const formatVND = (n: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n);

@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react';
-import { products } from '../data/products';
+import { useState } from 'react';
+import { api } from '../lib/api';
+import { useApi } from '../lib/useApi';
 import ProductCard from '../components/ProductCard';
+import { Loading, ErrorNote } from '../components/Status';
 
 const filters = [
   { key: 'all', label: 'Tất cả' },
@@ -8,19 +10,25 @@ const filters = [
   { key: 'phu-kien', label: 'Phụ kiện' },
 ] as const;
 
-type SortKey = 'featured' | 'price-asc' | 'price-desc';
+type SortKey = 'featured' | 'price_asc' | 'price_desc';
 
 export default function Shop() {
   const [cat, setCat] = useState<string>('all');
   const [sort, setSort] = useState<SortKey>('featured');
 
-  const list = useMemo(() => {
-    let l = products.filter((p) => (cat === 'all' ? true : p.category === cat));
-    if (sort === 'price-asc') l = [...l].sort((a, b) => a.price - b.price);
-    else if (sort === 'price-desc') l = [...l].sort((a, b) => b.price - a.price);
-    else l = [...l].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
-    return l;
-  }, [cat, sort]);
+  const { data: products, loading, error } = useApi(
+    () =>
+      api.products({
+        category: cat === 'all' ? undefined : cat,
+        sort: sort === 'featured' ? undefined : sort,
+      }),
+    [cat, sort]
+  );
+
+  const list =
+    sort === 'featured' && products
+      ? [...products].sort((a, b) => Number(!!b.featured) - Number(!!a.featured))
+      : products ?? [];
 
   return (
     <>
@@ -52,17 +60,21 @@ export default function Shop() {
               <span className="muted">Sắp xếp</span>
               <select className="input" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
                 <option value="featured">Nổi bật</option>
-                <option value="price-asc">Giá thấp → cao</option>
-                <option value="price-desc">Giá cao → thấp</option>
+                <option value="price_asc">Giá thấp → cao</option>
+                <option value="price_desc">Giá cao → thấp</option>
               </select>
             </label>
           </div>
 
-          <div className="grid cols-3 shop__grid">
-            {list.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          {loading && <Loading />}
+          {error && <ErrorNote message={error} />}
+          {!loading && !error && (
+            <div className="grid cols-3 shop__grid">
+              {list.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>

@@ -1,17 +1,68 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getProduct, formatVND, products } from '../data/products';
-import { getStory } from '../data/stories';
+import { api, ApiError } from '../lib/api';
+import { useApi } from '../lib/useApi';
+import { formatVND } from '../data/types';
 import { useCart } from '../context/CartContext';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
+import { Loading, ErrorNote } from '../components/Status';
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  const product = slug ? getProduct(slug) : undefined;
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+
+  const { data: product, loading, error } = useApi(
+    async () => {
+      try {
+        return await api.product(slug!);
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 404) return null;
+        throw err;
+      }
+    },
+    [slug]
+  );
+
+  const { data: story } = useApi(
+    async () => {
+      if (!product?.storySlug) return null;
+      try {
+        return await api.story(product.storySlug);
+      } catch {
+        return null;
+      }
+    },
+    [product?.storySlug]
+  );
+
+  const { data: related } = useApi(
+    async () => {
+      if (!product) return [];
+      const list = await api.products({ category: product.category });
+      return list.filter((p) => p.id !== product.id).slice(0, 3);
+    },
+    [product?.id]
+  );
+
+  if (loading) {
+    return (
+      <section className="section section--top container">
+        <Loading />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="section container">
+        <ErrorNote message={error} />
+        <Link to="/shop" className="btn btn--ghost">← Về cửa hàng</Link>
+      </section>
+    );
+  }
 
   if (!product) {
     return (
@@ -21,9 +72,6 @@ export default function ProductDetail() {
       </section>
     );
   }
-
-  const story = product.storySlug ? getStory(product.storySlug) : undefined;
-  const related = products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
 
   const handleAdd = () => {
     add(product, qty);
@@ -103,7 +151,7 @@ export default function ProductDetail() {
         </section>
       )}
 
-      {related.length > 0 && (
+      {related && related.length > 0 && (
         <section className="section">
           <div className="container">
             <div className="section-head"><h2>Có thể bạn cũng thích</h2></div>

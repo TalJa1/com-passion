@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { googleLogout } from '@react-oauth/google';
 import { api, clearToken, getToken, setOnUnauthorized, setToken } from '../lib/api';
 import type { User } from '../data/types';
 
@@ -24,6 +25,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     clearToken();
     setUser(null);
+    // Tắt tự động chọn tài khoản của Google, nếu không lần đăng nhập kế tiếp
+    // sẽ bị "kẹt" do Google cố đăng nhập ngầm lại tài khoản vừa đăng xuất.
+    googleLogout();
   }, []);
 
   // Đăng xuất tự động khi backend trả 401.

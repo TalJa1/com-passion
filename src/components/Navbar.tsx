@@ -45,7 +45,7 @@ export default function Navbar() {
           </Link>
           <Link to="/gio-hang" className="nav__icon nav__cart" aria-label="Giỏ hàng">
             🛍️
-            {count > 0 && <span className="nav__badge">{count}</span>}
+            {count > 0 && <span className="nav__badge" key={count}>{count}</span>}
           </Link>
           <button
             className="nav__burger"

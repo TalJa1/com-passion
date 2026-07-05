@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -13,11 +13,14 @@ import Login from './pages/Login';
 import Account from './pages/Account';
 
 function App() {
+  const location = useLocation();
+
   return (
     <>
       <ScrollToTop />
       <Navbar />
-      <main className="main">
+      {/* key theo pathname để chạy lại hiệu ứng vào trang */}
+      <main className="main page-enter" key={location.pathname}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />

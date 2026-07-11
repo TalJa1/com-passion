@@ -1,0 +1,714 @@
+/* ============================================================
+   com-passion — Design System
+   Tông màu: xanh lá cây + cam ấm / vàng đất. Phong cách tối giản.
+   ============================================================ */
+
+:root {
+  /* Brand palette */
+  --green-900: #18382a;
+  --green-700: #1f5440;
+  --green-600: #2e6b4f;
+  --green-500: #3a8062;
+  --green-200: #cfe3d6;
+  --green-50: #eef5ef;
+
+  --clay-600: #c45f2e;
+  --clay-500: #e07a3f; /* warm orange — primary CTA */
+  --clay-400: #ea935c;
+  --clay-100: #fbe7d7;
+
+  --sand-600: #b88a4a;
+  --sand-400: #d9b26f; /* earth yellow */
+  --sand-100: #f3e7cf;
+
+  /* Neutrals */
+  --cream: #faf6ee;
+  --surface: #ffffff;
+  --border: #e8e0d2;
+  --border-strong: #d8cdb8;
+  --text: #2a2620;
+  --text-muted: #6f675b;
+  --text-soft: #938b7d;
+
+  /* Semantic */
+  --bg: var(--cream);
+  --accent: var(--clay-500);
+  --accent-strong: var(--clay-600);
+  --primary: var(--green-600);
+
+  --shadow-sm: 0 1px 2px rgba(40, 33, 20, 0.06);
+  --shadow-md: 0 8px 24px -12px rgba(40, 33, 20, 0.22);
+  --shadow-lg: 0 24px 60px -24px rgba(31, 84, 64, 0.32);
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  --maxw: 1180px;
+  --gap: clamp(1rem, 3vw, 2rem);
+
+  --sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+
+  font: 17px/1.6 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom Scrollbar for a minimalist look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+
+  /* Make sure interactive elements also hide default cursor, except select which needs OS cursor for dropdown */
+  a,
+  button,
+  input,
+  textarea,
+  [role="button"],
+  .interactive {
+    cursor: none !important;
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  /* Custom Cursor Styles */
+  .custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: multiply;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* lenis smooth scroll fix */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  color: var(--green-900);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+}
+h2 {
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+}
+h3 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin: 0;
+}
+
+/* ---------- Layout helpers ---------- */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+@media (max-width: 360px) {
+  .container {
+    padding-inline: 0.5rem;
+  }
+}
+
+.section {
+  padding-block: clamp(3.5rem, 8vw, 6rem);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green-600);
+}
+
+.section-head {
+  max-width: 640px;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+.section-head p {
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+}
+.section-head.center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  --btn-bg: var(--green-600);
+  --btn-fg: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 0.96rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn--accent {
+  --btn-bg: var(--clay-500);
+}
+.btn--accent:hover {
+  --btn-bg: var(--clay-600);
+}
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--green-700);
+  border-color: var(--border-strong);
+  box-shadow: none;
+}
+.btn--ghost:hover {
+  background: var(--green-50);
+  box-shadow: none;
+}
+.btn--light {
+  --btn-bg: #fff;
+  --btn-fg: var(--green-700);
+}
+.btn--block {
+  width: 100%;
+}
+.btn--lg {
+  padding: 1rem 1.9rem;
+  font-size: 1.05rem;
+}
+.btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---------- Badge / chip ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--sand-100);
+  color: var(--sand-600);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.chip--green {
+  background: var(--green-50);
+  color: var(--green-600);
+}
+.chip--clay {
+  background: var(--clay-100);
+  color: var(--clay-600);
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Forms ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font: inherit;
+  font-size: 0.98rem;
+  color: var(--text);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--green-500);
+  box-shadow: 0 0 0 3px var(--green-50);
+}
+
+/* ---------- Utilities ---------- */
+.text-accent {
+  color: var(--accent-strong);
+}
+.text-green {
+  color: var(--green-600);
+}
+.muted {
+  color: var(--text-muted);
+}
+.grid {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 900px) {
+  .cols-3,
+  .cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .cols-2,
+  .cols-3,
+  .cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Fade-in on load */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ---------- Forms & Inputs ---------- */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+  outline: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--green-500);
+  background-color: var(--green-50);
+  box-shadow: 0 0 0 4px rgba(58, 128, 98, 0.15);
+  transform: translateY(-2px);
+  caret-color: var(--green-600);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-soft);
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Custom Checkbox */
+input[type="checkbox"] {
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface);
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+input[type="checkbox"]:checked {
+  background: var(--clay-500);
+  border-color: var(--clay-500);
+}
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+input[type="checkbox"]:focus {
+  box-shadow: 0 0 0 3px rgba(224, 122, 63, 0.2);
+}
+
+/* Custom Select */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232e6b4f%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem top 50%;
+  background-size: 0.65rem auto;
+  padding-right: 2rem;
+}
+
+/* Secondary Button Fallback */
+button:not(.btn):not(.interactive) {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+button:not(.btn):not(.interactive):hover {
+  background: var(--sand-100);
+  border-color: var(--green-600);
+  color: var(--green-900);
+}
+
+/* ============================================================
+   Grid Responsiveness
+   ============================================================ */
+@media (max-width: 900px) {
+  .cols-3,
+  .cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 600px) {
+  .cols-3,
+  .cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ============================================================
+   Motion — hiệu ứng nhẹ, hiện đại
+   ============================================================ */
+
+/* Chuyển trang: nội dung mới trồi lên nhẹ nhàng */
+.page-enter {
+  animation: rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Các lưới/danh sách: phần tử xuất hiện so le khi được render */
+.grid > *,
+.stories > *,
+.upcoming__list > *,
+.reports > *,
+.orders > * {
+  animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.grid > *:nth-child(2),
+.stories > *:nth-child(2),
+.upcoming__list > *:nth-child(2),
+.reports > *:nth-child(2),
+.orders > *:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.grid > *:nth-child(3),
+.stories > *:nth-child(3),
+.upcoming__list > *:nth-child(3),
+.reports > *:nth-child(3),
+.orders > *:nth-child(3) {
+  animation-delay: 0.14s;
+}
+.grid > *:nth-child(4) {
+  animation-delay: 0.21s;
+}
+.grid > *:nth-child(5) {
+  animation-delay: 0.28s;
+}
+.grid > *:nth-child(6) {
+  animation-delay: 0.35s;
+}
+.grid > *:nth-child(n + 7) {
+  animation-delay: 0.4s;
+}
+
+/* Emoji minh hoạ: lơ lửng nhẹ, phóng to khi hover thẻ */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.photo__emoji {
+  animation: floaty 5s ease-in-out infinite;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pcard:hover .photo__emoji,
+.story-card:hover .photo__emoji,
+.feature:hover .photo__emoji {
+  animation-play-state: paused;
+  transform: scale(1.15) rotate(-4deg);
+}
+
+/* Nút: nhún nhẹ khi bấm */
+.btn:active {
+  transform: translateY(0) scale(0.97);
+}
+.pill,
+.qty button {
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.pill:active,
+.qty button:active {
+  transform: scale(0.94);
+}
+
+/* Huy hiệu số lượng giỏ hàng: bật lên khi thay đổi */
+@keyframes pop {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.nav__badge {
+  animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Vòng xoay tải dữ liệu */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--green-50, #e6efe9);
+  border-top-color: var(--green-600, #2e6b4f);
+  animation: spin 0.8s linear infinite;
+  margin-inline: auto;
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.loading-note {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+/* Thẻ nổi ở hero: lơ lửng chậm */
+.hero__floatcard {
+  animation: floaty 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Link "Đọc tiếp →": nút đẹp mắt trượt nhẹ khi hover */
+.story-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: var(--green-700);
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.7rem, 3vw, 1.2rem);
+  font-size: clamp(0.75rem, 3vw, 0.95rem);
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+  background: var(--green-50);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: fit-content;
+}
+.story-card:hover .story-card__more,
+.feature:hover .story-card__more {
+  background: var(--green-600);
+  color: #fff;
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(46, 107, 79, 0.25);
+}
+
+/* Tôn trọng người dùng hạn chế chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

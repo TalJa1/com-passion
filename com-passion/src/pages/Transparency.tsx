@@ -4,6 +4,7 @@ import { useApi } from '../lib/useApi';
 import { formatVND } from '../data/types';
 import CountUp from '../components/CountUp';
 import { Loading, ErrorNote } from '../components/Status';
+import { Skeleton, SkeletonText } from '../components/Skeleton';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -39,7 +40,17 @@ export default function Transparency() {
 
       <section className="section section--top">
         <div className="container">
-          {statsState.loading && <Loading />}
+          {statsState.loading && (
+            <div className="grid cols-4 tstats">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="tstat card">
+                  <Skeleton style={{ height: '3rem', width: '3rem', margin: '0 auto 0.5rem', borderRadius: '50%' }} />
+                  <Skeleton style={{ height: '2rem', width: '60%', margin: '0 auto 0.5rem', borderRadius: '4px' }} />
+                  <Skeleton style={{ height: '1rem', width: '80%', margin: '0 auto', borderRadius: '4px' }} />
+                </div>
+              ))}
+            </div>
+          )}
           {statsState.error && <ErrorNote message={statsState.error} />}
           {statsState.data && (
             <motion.div className="grid cols-4 tstats" initial="hidden" animate="visible" variants={staggerContainer}>
@@ -62,7 +73,26 @@ export default function Transparency() {
             <h2>Tiền đã đi về đâu?</h2>
           </motion.div>
 
-          {reportsState.loading && <Loading />}
+          {reportsState.loading && (
+            <div className="reports">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <article key={i} className="report card">
+                  <header className="report__head">
+                    <div>
+                      <Skeleton style={{ width: '80px', height: '24px', borderRadius: 'var(--radius-pill)', marginBottom: '0.5rem' }} />
+                      <Skeleton style={{ height: '1.5rem', width: '200px', marginBottom: '0.5rem' }} />
+                      <SkeletonText lines={2} style={{ width: '300px' }} />
+                    </div>
+                    <div className="report__total">
+                      <Skeleton style={{ width: '100px', height: '1.2rem', marginBottom: '0.5rem' }} />
+                      <Skeleton style={{ width: '150px', height: '2rem' }} />
+                    </div>
+                  </header>
+                  <Skeleton style={{ height: '16px', width: '100%', borderRadius: 'var(--radius-pill)', marginTop: '2rem' }} />
+                </article>
+              ))}
+            </div>
+          )}
           {reportsState.error && <ErrorNote message={reportsState.error} />}
           {reportsState.data && (
             <motion.div className="reports" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>

@@ -5,6 +5,7 @@ import { useApi } from '../lib/useApi';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
 import { Loading, ErrorNote } from '../components/Status';
+import { SkeletonStoryDetail } from '../components/Skeleton';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -40,7 +41,7 @@ export default function StoryDetail() {
   if (loading) {
     return (
       <section className="section section--top container">
-        <Loading />
+        <SkeletonStoryDetail />
       </section>
     );
   }

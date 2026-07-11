@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { api, ApiError } from '../lib/api';
 import { useApi } from '../lib/useApi';
 import { formatVND } from '../data/types';
@@ -7,6 +8,17 @@ import { useCart } from '../context/CartContext';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
 import { Loading, ErrorNote } from '../components/Status';
+import { SkeletonProductDetail } from '../components/Skeleton';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -50,7 +62,7 @@ export default function ProductDetail() {
   if (loading) {
     return (
       <section className="section section--top container">
-        <Loading />
+        <SkeletonProductDetail />
       </section>
     );
   }
@@ -80,56 +92,77 @@ export default function ProductDetail() {
   };
 
   return (
-    <>
+    <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
       <section className="section section--top">
         <div className="container">
-          <nav className="crumbs">
-            <Link to="/shop">Sản phẩm</Link> <span>/</span> <span>{product.name}</span>
-          </nav>
+          <motion.nav variants={fadeUp} className="crumbs" style={{ marginBottom: "2rem" }}>
+            <Link to="/shop" className="interactive">Sản phẩm</Link> <span>/</span> 
+            <span style={{ color: "var(--green-700)", fontWeight: 500 }}>{product.name}</span>
+          </motion.nav>
 
           <div className="pdp">
-            <div className="pdp__media">
-              <Photo art={product.art} ratio="1 / 1" />
-            </div>
+            <motion.div variants={fadeUp} className="pdp__media">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.4 }}>
+                <Photo art={product.art} ratio="1 / 1" style={{ borderRadius: "var(--radius-lg)" }} />
+              </motion.div>
+            </motion.div>
 
-            <div className="pdp__info">
-              <div className="pdp__meta">
+            <motion.div variants={staggerContainer} className="pdp__info">
+              <motion.div variants={fadeUp} className="pdp__meta">
                 <span className="chip chip--green">{product.maker}</span>
                 <span className="muted">📍 {product.region}</span>
-              </div>
-              <h1>{product.name}</h1>
-              <p className="pdp__price">{formatVND(product.price)}</p>
-              <p className="pdp__desc">{product.description}</p>
+              </motion.div>
+              <motion.h1 variants={fadeUp} style={{ fontSize: "clamp(2rem, 5vw, 3rem)", lineHeight: 1.2 }}>
+                {product.name}
+              </motion.h1>
+              <motion.p variants={fadeUp} className="pdp__price">{formatVND(product.price)}</motion.p>
+              <motion.p variants={fadeUp} className="pdp__desc" style={{ fontSize: "1.1rem" }}>{product.description}</motion.p>
 
-              <ul className="pdp__specs">
+              <motion.ul variants={fadeUp} className="pdp__specs">
                 <li><span className="muted">Chất liệu</span><strong>{product.materials.join(' · ')}</strong></li>
                 <li><span className="muted">Kích thước</span><strong>{product.size}</strong></li>
                 <li>
                   <span className="muted">Còn lại</span>
-                  <strong>{product.stock > 0 ? `${product.stock} chiếc` : 'Tạm hết'}</strong>
+                  <strong style={{ color: product.stock > 0 ? "inherit" : "var(--red-600)" }}>
+                    {product.stock > 0 ? `${product.stock} chiếc` : 'Tạm hết'}
+                  </strong>
                 </li>
-              </ul>
+              </motion.ul>
 
-              <div className="pdp__buy">
-                <div className="qty">
-                  <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Giảm">−</button>
-                  <span>{qty}</span>
+              <motion.div variants={fadeUp} className="pdp__buy">
+                <div className="qty" style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}>
+                  <button className="interactive" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Giảm">−</button>
+                  <span style={{ fontWeight: 500 }}>{qty}</span>
                   <button
+                    className="interactive"
                     onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
                     aria-label="Tăng"
                   >
                     +
                   </button>
                 </div>
-                <button className="btn btn--accent btn--lg pdp__add" onClick={handleAdd} disabled={product.stock === 0}>
-                  {added ? '✓ Đã thêm vào giỏ' : 'Thêm vào giỏ'}
-                </button>
-              </div>
+                <motion.button 
+                  whileHover={{ scale: product.stock > 0 ? 1.03 : 1 }}
+                  whileTap={{ scale: product.stock > 0 ? 0.97 : 1 }}
+                  className={`btn btn--accent btn--lg pdp__add ${added ? 'btn--success' : ''}`} 
+                  onClick={handleAdd} 
+                  disabled={product.stock === 0}
+                  style={{ 
+                    transition: "background 0.3s ease",
+                    background: added ? "var(--green-600)" : "",
+                    borderColor: added ? "var(--green-600)" : ""
+                  }}
+                >
+                  {added ? '✨ Đã thêm vào giỏ' : 'Thêm vào giỏ'}
+                </motion.button>
+              </motion.div>
 
-              <p className="pdp__assurance muted">
-                🤲 Phần lớn giá trị đơn hàng về thẳng tay nghệ nhân · 🍱 Một phần thành bữa trưa cho các em nhỏ
-              </p>
-            </div>
+              <motion.p variants={fadeUp} className="pdp__assurance muted" style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "1.5rem" }}>
+                <span>🤲 Trực tiếp tới tay nghệ nhân</span>
+                <span>·</span>
+                <span>🍱 Góp bữa trưa cho trẻ em</span>
+              </motion.p>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -137,16 +170,28 @@ export default function ProductDetail() {
       {story && (
         <section className="section pdp-story">
           <div className="container">
-            <div className="pdp-story__inner">
-              <Photo art={story.art} ratio="4 / 3" className="pdp-story__img" />
-              <div>
-                <span className="eyebrow">Câu chuyện đằng sau</span>
-                <h2>{story.title}</h2>
-                <p className="muted">{story.excerpt}</p>
-                <p className="pdp-story__body">{story.body[0]}</p>
-                <Link to={`/cau-chuyen/${story.slug}`} className="btn btn--ghost">Đọc toàn bộ câu chuyện →</Link>
-              </div>
-            </div>
+            <motion.div 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="pdp-story__inner"
+            >
+              <motion.div variants={fadeUp}>
+                <Photo art={story.art} ratio="4 / 3" className="pdp-story__img" style={{ borderRadius: "var(--radius-lg)" }} />
+              </motion.div>
+              <motion.div variants={staggerContainer}>
+                <motion.span variants={fadeUp} className="eyebrow">Câu chuyện đằng sau</motion.span>
+                <motion.h2 variants={fadeUp} style={{ fontSize: "2.5rem" }}>{story.title}</motion.h2>
+                <motion.p variants={fadeUp} className="muted" style={{ fontSize: "1.2rem", fontWeight: 500 }}>{story.excerpt}</motion.p>
+                <motion.p variants={fadeUp} className="pdp-story__body">{story.body[0]}</motion.p>
+                <motion.div variants={fadeUp}>
+                  <Link to={`/cau-chuyen/${story.slug}`} className="btn btn--ghost interactive">
+                    Đọc toàn bộ câu chuyện <span style={{ marginLeft: "0.5rem" }}>→</span>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       )}
@@ -154,15 +199,24 @@ export default function ProductDetail() {
       {related && related.length > 0 && (
         <section className="section">
           <div className="container">
-            <div className="section-head"><h2>Có thể bạn cũng thích</h2></div>
-            <div className="grid cols-3">
-              {related.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={staggerContainer}
+            >
+              <motion.div variants={fadeUp} className="section-head">
+                <h2 style={{ fontSize: "2rem" }}>Có thể bạn cũng thích</h2>
+              </motion.div>
+              <motion.div variants={fadeUp} className="grid cols-3">
+                {related.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       )}
-    </>
+    </motion.div>
   );
 }

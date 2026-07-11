@@ -6,6 +6,7 @@ import ProductCard from "../components/ProductCard";
 import CountUp from "../components/CountUp";
 import Photo from "../components/Photo";
 import { Loading, ErrorNote } from "../components/Status";
+import { Skeleton, SkeletonCard, SkeletonText } from "../components/Skeleton";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("vi-VN", {
@@ -177,7 +178,17 @@ export default function Home() {
             </span>
             <h2 style={{ color: "#fff" }}>Những con số biết nói</h2>
           </div>
-          {statsState.loading && <Loading />}
+          {statsState.loading && (
+            <div className="impact__grid">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="impact__stat">
+                  <Skeleton style={{ height: '3rem', width: '3rem', margin: '0 auto 0.5rem', borderRadius: '50%' }} />
+                  <Skeleton style={{ height: '2rem', width: '60%', margin: '0 auto 0.5rem', borderRadius: '4px' }} />
+                  <Skeleton style={{ height: '1rem', width: '80%', margin: '0 auto', borderRadius: '4px' }} />
+                </div>
+              ))}
+            </div>
+          )}
           {statsState.error && <ErrorNote message={statsState.error} />}
           {statsState.data && (
             <motion.div
@@ -228,7 +239,13 @@ export default function Home() {
               Tất cả sản phẩm →
             </Link>
           </motion.div>
-          {featuredState.loading && <Loading />}
+          {featuredState.loading && (
+            <div className="grid cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )}
           {featuredState.error && <ErrorNote message={featuredState.error} />}
           {featuredState.data && (
             <motion.div
@@ -269,7 +286,13 @@ export default function Home() {
             <span className="eyebrow">Người làm ra sản phẩm</span>
             <h2>Đằng sau mỗi chiếc giỏ là một con người</h2>
           </motion.div>
-          {storiesState.loading && <Loading />}
+          {storiesState.loading && (
+            <div className="grid cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )}
           {storiesState.error && <ErrorNote message={storiesState.error} />}
           {storiesState.data && (
             <motion.div
@@ -324,7 +347,19 @@ export default function Home() {
             <span className="eyebrow">Sắp ra mắt</span>
             <h2>Những kế hoạch mới</h2>
           </div>
-          {upcomingState.loading && <Loading />}
+          {upcomingState.loading && (
+            <div className="upcoming__list">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="upcoming__item card">
+                  <Skeleton style={{ width: '76px', height: '76px', borderRadius: 'var(--radius)', flexShrink: 0 }} />
+                  <div className="upcoming__info" style={{ width: '100%' }}>
+                    <Skeleton style={{ width: '120px', height: '24px', borderRadius: 'var(--radius-pill)', marginBottom: '0.8rem' }} />
+                    <SkeletonText lines={2} style={{ width: '80%' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {upcomingState.error && <ErrorNote message={upcomingState.error} />}
           {upcomingState.data && (
             <motion.div

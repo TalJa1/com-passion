@@ -152,7 +152,7 @@ html.lenis {
   box-sizing: border-box;
 }
 
-html {
+html { overflow-y: scroll;
   scroll-behavior: smooth;
 }
 

@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { useApi } from '../lib/useApi';
 import ProductCard from '../components/ProductCard';
 import { Loading, ErrorNote } from '../components/Status';
+import { SkeletonCard } from '../components/Skeleton';
 import CustomSelect from '../components/CustomSelect';
 
 const filters = [
@@ -101,7 +102,13 @@ export default function Shop() {
             </div>
           </motion.div>
 
-          {loading && <Loading />}
+          {loading && (
+            <div className="grid cols-3 shop__grid">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )}
           {error && <ErrorNote message={error} />}
           {!loading && !error && (
             <motion.div 

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth, badgeFor } from "../context/AuthContext";
 import { formatVND } from "../data/types";
 import { Loading } from "../components/Status";
+import { SkeletonAccount } from "../components/Skeleton";
 import {
   Heart,
   ShoppingBag,
@@ -56,10 +58,10 @@ export default function Account() {
   const [editAvatar, setEditAvatar] = useState("");
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState(false);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
-  const [emailSentMsg, setEmailSentMsg] = useState("");
-  const [editSuccess, setEditSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     if (user && isEditModalOpen) {
@@ -67,7 +69,7 @@ export default function Account() {
       setEditAvatar(user.avatar || "");
       setEditError("");
       setEditSuccess(false);
-      setEmailSentMsg("");
+      setResetSent(false);
     }
   }, [user, isEditModalOpen]);
 
@@ -100,7 +102,7 @@ export default function Account() {
   if (loading) {
     return (
       <section className="section section--top container">
-        <Loading label="Đang khôi phục phiên đăng nhập…" />
+        <SkeletonAccount />
       </section>
     );
   }
@@ -780,14 +782,14 @@ export default function Account() {
       </div>
 
       {/* Edit Profile Modal */}
-      {isEditModalOpen && (
+      {isEditModalOpen && createPortal(
         <div
           style={{
             position: "fixed",
             top: 0,
             left: 0,
-            width: "100%",
-            height: "100%",
+            width: "100vw",
+            height: "100vh",
             background: "rgba(0,0,0,0.5)",
             zIndex: 1000,
             display: "flex",
@@ -897,45 +899,72 @@ export default function Account() {
                   gap: "0.5rem",
                 }}
               >
-                <ShieldCheck size={20} /> Bảo mật tài khoản
+                <ShieldCheck size={20} /> Bảo mật
               </h3>
               
-              <div style={{ background: "var(--cream)", padding: "1rem", borderRadius: "var(--radius-sm)" }}>
-                <p className="muted" style={{ fontSize: "0.95rem", marginBottom: "1rem" }}>
-                  Để đảm bảo an toàn tuyệt đối cho tài khoản của bạn, chúng tôi sẽ gửi một đường dẫn thay đổi mật khẩu về địa chỉ email: <strong>{user.email}</strong>.
-                </p>
-                {emailSentMsg ? (
-                  <div style={{ color: "var(--green-700)", fontWeight: "bold", fontSize: "0.95rem" }}>
-                    {emailSentMsg}
+              {!resetSent ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsResetting(true);
+                    setEditError("");
+                    try {
+                      // Import resetPassword from useAuth? Wait, resetPassword is not destructured at the top. Let's make sure it is!
+                      // I will handle it in the next chunk.
+                      await resetPassword(user.email);
+                      setResetSent(true);
+                    } catch (err: any) {
+                      setEditError("Lỗi khi gửi email: " + err.message);
+                    } finally {
+                      setIsResetting(false);
+                    }
+                  }}
+                  disabled={isResetting}
+                  className="btn btn--light interactive"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    padding: "0.8rem",
+                    width: "100%",
+                    background: "var(--cream)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text)",
+                    fontWeight: 500,
+                  }}
+                >
+                  {isResetting ? "Đang gửi..." : "📧 Gửi email yêu cầu đổi mật khẩu"}
+                </button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  style={{
+                    padding: "1rem",
+                    background: "var(--green-50)",
+                    border: "1px solid var(--green-200)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "var(--green-800)",
+                    fontSize: "0.95rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    overflow: "hidden"
+                  }}
+                >
+                  <span style={{ fontSize: "1.2rem" }}>✨</span> 
+                  <div>
+                    Đã gửi đường link đổi mật khẩu qua email! Vui lòng kiểm tra hộp thư của bạn.
                   </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn--outline interactive"
-                    onClick={async () => {
-                      try {
-                        setIsSendingEmail(true);
-                        setEditError("");
-                        await resetPassword(user.email);
-                        setEmailSentMsg("✨ Đã gửi! Vui lòng kiểm tra hộp thư email của bạn (bao gồm cả thư mục Spam/Quảng cáo).");
-                      } catch (err: any) {
-                        setEditError(err.message || "Không thể gửi email lúc này.");
-                      } finally {
-                        setIsSendingEmail(false);
-                      }
-                    }}
-                    disabled={isSendingEmail}
-                  >
-                    {isSendingEmail ? "Đang gửi email..." : "📧 Gửi link đổi mật khẩu qua Email"}
-                  </button>
-                )}
-              </div>
-
+                </motion.div>
+              )}
+              
               <button
                 type="submit"
                 className="btn btn--accent interactive"
                 style={{
-                  marginTop: "1.5rem",
+                  marginTop: "1rem",
                   width: "100%",
                   justifyContent: "center",
                 }}
@@ -946,7 +975,7 @@ export default function Account() {
             </form>
             )}
           </motion.div>
-        </div>
+        </div>, document.body
       )}
     </section>
   );

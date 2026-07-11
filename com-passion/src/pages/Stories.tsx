@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import Photo from "../components/Photo";
 import { Loading, ErrorNote } from "../components/Status";
+import { SkeletonStory } from "../components/Skeleton";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 50 },
@@ -68,7 +69,13 @@ export default function Stories() {
 
       <section className="section section--top">
         <div className="container">
-          {loading && <Loading />}
+          {loading && (
+            <div className="stories">
+              <SkeletonStory />
+              <SkeletonStory />
+              <SkeletonStory />
+            </div>
+          )}
           {error && <ErrorNote message={error} />}
           {stories && (
             <div className="stories">

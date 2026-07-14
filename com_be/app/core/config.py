@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     
     resend_api_key: str | None = None
     resend_audience_id: str | None = None
+    resend_from_email: str = "onboarding@resend.dev"
+    cron_secret_token: str | None = None
 
     @property
     def async_database_url(self) -> str:

@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     cloudinary_cloud_name: str | None = None
     cloudinary_api_key: str | None = None
     cloudinary_api_secret: str | None = None
+    
+    resend_api_key: str | None = None
+    resend_audience_id: str | None = None
 
     @property
     def async_database_url(self) -> str:

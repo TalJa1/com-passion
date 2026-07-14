@@ -1,21 +1,31 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-
+import { api } from '../lib/api';
 export default function NewsletterSignup() {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (user) setEmail(user.email);
   }, [user]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email && !user) return;
-    // TODO(backend): gửi email tới dịch vụ newsletter thật (Mailchimp/Resend...).
-    setDone(true);
+    
+    try {
+      setIsLoading(true);
+      await api.subscribeNewsletter(email);
+      setDone(true);
+    } catch (err: any) {
+      alert(err.message || 'Có lỗi xảy ra, vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -74,8 +84,13 @@ export default function NewsletterSignup() {
                   <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Tài khoản của bạn</p>
                   <p style={{ margin: 0, fontWeight: 600, color: 'var(--green-900)' }}>{user.email}</p>
                 </div>
-                <button className="btn btn--accent interactive" type="submit" style={{ padding: '0.75rem 1.6rem', whiteSpace: 'nowrap' }}>
-                  Đăng ký ngay
+                <button 
+                  className="btn btn--accent interactive" 
+                  type="submit" 
+                  disabled={isLoading}
+                  style={{ padding: '0.75rem 1.6rem', whiteSpace: 'nowrap', opacity: isLoading ? 0.7 : 1 }}
+                >
+                  {isLoading ? 'Đang gửi...' : 'Đăng ký ngay'}
                 </button>
               </div>
             ) : (
@@ -88,10 +103,18 @@ export default function NewsletterSignup() {
                   placeholder="email@cua-ban.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                   aria-label="Email của bạn"
-                  style={{ borderRadius: 'var(--radius-pill)', padding: '0.85rem 1.5rem' }}
+                  style={{ borderRadius: 'var(--radius-pill)', padding: '0.85rem 1.5rem', opacity: isLoading ? 0.7 : 1 }}
                 />
-                <button className="btn btn--accent interactive" type="submit" style={{ padding: '0.85rem 1.8rem' }}>Đăng ký</button>
+                <button 
+                  className="btn btn--accent interactive" 
+                  type="submit" 
+                  disabled={isLoading}
+                  style={{ padding: '0.85rem 1.8rem', opacity: isLoading ? 0.7 : 1 }}
+                >
+                  {isLoading ? 'Đang gửi...' : 'Đăng ký'}
+                </button>
               </>
             )}
           </motion.form>

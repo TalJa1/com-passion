@@ -126,6 +126,10 @@ export const api = {
   createOrder: (body: OrderCreate) =>
     request<Order>('/orders', { method: 'POST', body, auth: true }),
   contribution: () => request<{ total: number }>('/me/contribution', { auth: true }),
+
+  // Newsletter
+  subscribeNewsletter: (email: string) => 
+    request<{ message: string }>('/newsletter/subscribe', { method: 'POST', body: { email } }),
 };
 
 /** Lấy thông báo lỗi tiếng Việt từ một lỗi bất kỳ. */

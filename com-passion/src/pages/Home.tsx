@@ -73,15 +73,47 @@ export default function Home() {
             </motion.div>
             <motion.div variants={fadeUp} className="hero__trust">
               {statsState.loading ? (
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <Skeleton style={{ width: '120px', height: '24px', borderRadius: '4px' }} />
-                  <Skeleton style={{ width: '150px', height: '24px', borderRadius: '4px' }} />
-                  <Skeleton style={{ width: '130px', height: '24px', borderRadius: '4px' }} />
+                <div
+                  style={{ display: "flex", gap: "1rem", alignItems: "center" }}
+                >
+                  <Skeleton
+                    style={{
+                      width: "120px",
+                      height: "24px",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <Skeleton
+                    style={{
+                      width: "150px",
+                      height: "24px",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <Skeleton
+                    style={{
+                      width: "130px",
+                      height: "24px",
+                      borderRadius: "4px",
+                    }}
+                  />
                 </div>
               ) : (
                 <>
-                  <span>🤲 {statsState.data?.find(s => s.key === 'artisans')?.value || 14} nghệ nhân</span>
-                  <span>🍱 {(statsState.data?.find(s => s.key === 'meals')?.value || 5400).toLocaleString('vi-VN')} bữa trưa</span>
+                  <span>
+                    🤲{" "}
+                    {statsState.data?.find((s) => s.key === "artisans")
+                      ?.value || 0}{" "}
+                    nghệ nhân
+                  </span>
+                  <span>
+                    🍱{" "}
+                    {(
+                      statsState.data?.find((s) => s.key === "meals")?.value ||
+                      0
+                    ).toLocaleString("vi-VN")}{" "}
+                    bữa trưa
+                  </span>
                   <span>🧾 Hoá đơn công khai</span>
                 </>
               )}
@@ -92,7 +124,11 @@ export default function Home() {
             className="hero__art"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const, delay: 0.2 }}
+            transition={{
+              duration: 1,
+              ease: [0.16, 1, 0.3, 1] as const,
+              delay: 0.2,
+            }}
           >
             <Photo
               art={{
@@ -103,7 +139,7 @@ export default function Home() {
                   "Ảnh cô chú vùng cao bên những chiếc giỏ đan tay",
               }}
               ratio="4 / 5"
-              imgUrl={featuredState.data?.find(p => p.id === 'p1')?.imageUrl}
+              imgUrl={featuredState.data?.find((p) => p.id === "p1")?.imageUrl}
             />
             <motion.div
               className="hero__floatcard card"
@@ -117,14 +153,41 @@ export default function Home() {
               }}
             >
               {statsState.loading ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <Skeleton style={{ width: '100px', height: '28px', borderRadius: '4px' }} />
-                  <Skeleton style={{ width: '160px', height: '16px', borderRadius: '4px' }} />
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <Skeleton
+                    style={{
+                      width: "100px",
+                      height: "28px",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <Skeleton
+                    style={{
+                      width: "160px",
+                      height: "16px",
+                      borderRadius: "4px",
+                    }}
+                  />
                 </div>
               ) : (
                 <>
-                  <strong style={{ color: "var(--green-800)" }}>{statsState.data?.find(s => s.key === 'funds')?.value || 86}{statsState.data?.find(s => s.key === 'funds')?.suffix || " triệu₫"}</strong>
-                  <span className="muted" style={{ color: "var(--clay-700)" }}>{statsState.data?.find(s => s.key === 'funds')?.label?.toLowerCase() || "đã tích luỹ cho cộng đồng"}</span>
+                  <strong style={{ color: "var(--green-800)" }}>
+                    {statsState.data?.find((s) => s.key === "funds")?.value ||
+                      86}
+                    {statsState.data?.find((s) => s.key === "funds")?.suffix ||
+                      " triệu₫"}
+                  </strong>
+                  <span className="muted" style={{ color: "var(--clay-700)" }}>
+                    {statsState.data
+                      ?.find((s) => s.key === "funds")
+                      ?.label?.toLowerCase() || "đã tích luỹ cho cộng đồng"}
+                  </span>
                 </>
               )}
             </motion.div>
@@ -206,9 +269,30 @@ export default function Home() {
             <div className="impact__grid">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="impact__stat">
-                  <Skeleton style={{ height: '3rem', width: '3rem', margin: '0 auto 0.5rem', borderRadius: '50%' }} />
-                  <Skeleton style={{ height: '2rem', width: '60%', margin: '0 auto 0.5rem', borderRadius: '4px' }} />
-                  <Skeleton style={{ height: '1rem', width: '80%', margin: '0 auto', borderRadius: '4px' }} />
+                  <Skeleton
+                    style={{
+                      height: "3rem",
+                      width: "3rem",
+                      margin: "0 auto 0.5rem",
+                      borderRadius: "50%",
+                    }}
+                  />
+                  <Skeleton
+                    style={{
+                      height: "2rem",
+                      width: "60%",
+                      margin: "0 auto 0.5rem",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  <Skeleton
+                    style={{
+                      height: "1rem",
+                      width: "80%",
+                      margin: "0 auto",
+                      borderRadius: "4px",
+                    }}
+                  />
                 </div>
               ))}
             </div>
@@ -291,7 +375,7 @@ export default function Home() {
                   <motion.div key={p.id} variants={fadeUp}>
                     <ProductCard product={p} />
                   </motion.div>
-              ))}
+                ))}
             </motion.div>
           )}
         </div>
@@ -370,10 +454,24 @@ export default function Home() {
             <div className="upcoming__list">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="upcoming__item card">
-                  <Skeleton style={{ width: '76px', height: '76px', borderRadius: 'var(--radius)', flexShrink: 0 }} />
-                  <div className="upcoming__info" style={{ width: '100%' }}>
-                    <Skeleton style={{ width: '120px', height: '24px', borderRadius: 'var(--radius-pill)', marginBottom: '0.8rem' }} />
-                    <SkeletonText lines={2} style={{ width: '80%' }} />
+                  <Skeleton
+                    style={{
+                      width: "76px",
+                      height: "76px",
+                      borderRadius: "var(--radius)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div className="upcoming__info" style={{ width: "100%" }}>
+                    <Skeleton
+                      style={{
+                        width: "120px",
+                        height: "24px",
+                        borderRadius: "var(--radius-pill)",
+                        marginBottom: "0.8rem",
+                      }}
+                    />
+                    <SkeletonText lines={2} style={{ width: "80%" }} />
                   </div>
                 </div>
               ))}

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     google_client_id: str | None = None
     firebase_credentials_path: str | None = None
     firebase_project_id: str | None = None
-    cors_origins: list[str] = ["https://donation-web-six-nu.vercel.app/","http://localhost:5173"]
+    cors_origins: list[str] = ["https://donation-web-six-nu.vercel.app","http://localhost:5173"]
 
     cloudinary_cloud_name: str | None = None
     cloudinary_api_key: str | None = None

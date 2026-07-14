@@ -5,7 +5,7 @@ import { useApi } from "../lib/useApi";
 import ProductCard from "../components/ProductCard";
 import CountUp from "../components/CountUp";
 import Photo from "../components/Photo";
-import { Loading, ErrorNote } from "../components/Status";
+import { ErrorNote } from "../components/Status";
 import { Skeleton, SkeletonCard, SkeletonText } from "../components/Skeleton";
 
 const formatDate = (iso: string) =>

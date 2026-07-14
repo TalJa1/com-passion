@@ -13,6 +13,7 @@ import Transparency from './pages/Transparency';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Account from './pages/Account';
+import WelcomePopup from './components/WelcomePopup';
 
 function App() {
   const location = useLocation();
@@ -22,6 +23,7 @@ function App() {
       <Cursor />
       <ScrollToTop />
       <Navbar />
+      <WelcomePopup />
       {/* key theo pathname để chạy lại hiệu ứng vào trang */}
       <main className="main page-enter" key={location.pathname}>
         <Routes>

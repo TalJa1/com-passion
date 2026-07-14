@@ -19,6 +19,8 @@ interface AuthValue {
   totalContribution: number;
   updateUserProfile: (name: string, avatar: string) => Promise<void>;
   changePassword: (newPassword: string) => Promise<void>;
+  justLoggedIn: boolean;
+  setJustLoggedIn: (val: boolean) => void;
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -26,6 +28,7 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(() => !!getToken());
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
   const logout = useCallback(async () => {
     await signOut(firebaseAuth).catch(() => {});
@@ -58,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // So it's res.access_token. Let's cast as any if TypeScript complains.
     setToken((res as any).access_token || (res as any).accessToken);
     setUser(res.user);
+    setJustLoggedIn(true);
   };
 
   const loginWithEmail = useCallback(async (e: string, p: string) => {
@@ -111,8 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthValue>(() => {
     const totalContribution = user?.orders.reduce((s, o) => s + o.total, 0) ?? 0;
-    return { user, loading, loginWithEmail, registerWithEmail, loginWithGoogle, resetPassword, logout, refresh, totalContribution, updateUserProfile, changePassword };
-  }, [user, loading, loginWithEmail, registerWithEmail, loginWithGoogle, resetPassword, logout, refresh, updateUserProfile, changePassword]);
+    return { user, loading, loginWithEmail, registerWithEmail, loginWithGoogle, resetPassword, logout, refresh, totalContribution, updateUserProfile, changePassword, justLoggedIn, setJustLoggedIn };
+  }, [user, loading, loginWithEmail, registerWithEmail, loginWithGoogle, resetPassword, logout, refresh, updateUserProfile, changePassword, justLoggedIn]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { api } from '../lib/api';
 import { useApi } from '../lib/useApi';
 import ProductCard from '../components/ProductCard';
-import { Loading, ErrorNote } from '../components/Status';
+import { ErrorNote } from '../components/Status';
 import { SkeletonCard } from '../components/Skeleton';
 import CustomSelect from '../components/CustomSelect';
 

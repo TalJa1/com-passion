@@ -11,8 +11,9 @@ export default function Cursor() {
   const [isHovering, setIsHovering] = useState(false);
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
-      x.set(e.clientX - SIZE / 2);
-      y.set(e.clientY - SIZE / 2);
+      // Đặt hotspot vào đầu mũi của chiếc lá (góc trên bên trái) thay vì ở giữa
+      x.set(e.clientX - 4);
+      y.set(e.clientY - 4);
     };
 
     const updateHover = (e: MouseEvent) => {
@@ -22,8 +23,8 @@ export default function Cursor() {
     };
     
     const handleMouseEnter = (e: MouseEvent) => {
-      x.set(e.clientX - SIZE / 2);
-      y.set(e.clientY - SIZE / 2);
+      x.set(e.clientX - 4);
+      y.set(e.clientY - 4);
     };
 
     window.addEventListener("mousemove", updateMousePosition);

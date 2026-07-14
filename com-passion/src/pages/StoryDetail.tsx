@@ -1,10 +1,10 @@
-﻿import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api, ApiError } from '../lib/api';
 import { useApi } from '../lib/useApi';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
-import { Loading, ErrorNote } from '../components/Status';
+import { ErrorNote } from '../components/Status';
 import { SkeletonStoryDetail } from '../components/Skeleton';
 
 const fadeUp = {
@@ -35,14 +35,44 @@ export default function StoryDetail() {
     [slug]
   );
 
-  const { data: allStories } = useApi(() => api.stories());
-  const { data: allProducts } = useApi(() => api.products());
+  const { data: allStories, loading: allStoriesLoading } = useApi(() => api.stories());
+  const { data: allProducts, loading: allProductsLoading } = useApi(() => api.products());
 
   if (loading) {
     return (
-      <section className="section section--top container">
-        <SkeletonStoryDetail />
-      </section>
+      <motion.div initial="hidden" animate="visible" exit="hidden" variants={fadeUp}>
+        <section className="section section--top container">
+          <SkeletonStoryDetail />
+        </section>
+
+        {/* Skeleton for Related Products */}
+        <section className="section">
+          <div className="container">
+            <div className="section-head center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ width: '120px', height: '16px', borderRadius: '4px' }}></div>
+              <div className="skeleton" style={{ width: '350px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-3">
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skeleton for More Stories */}
+        <section className="section story-more">
+          <div className="container">
+            <div className="section-head">
+              <div className="skeleton" style={{ width: '250px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-2">
+              <div className="skeleton" style={{ height: '220px', borderRadius: 'var(--radius-lg)' }}></div>
+              <div className="skeleton" style={{ height: '220px', borderRadius: 'var(--radius-lg)' }}></div>
+            </div>
+          </div>
+        </section>
+      </motion.div>
     );
   }
 
@@ -96,7 +126,21 @@ export default function StoryDetail() {
         </motion.div>
       </section>
 
-      {related.length > 0 && (
+      {allProductsLoading ? (
+        <section className="section">
+          <div className="container">
+            <div className="section-head center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              <div className="skeleton" style={{ width: '120px', height: '16px', borderRadius: '4px' }}></div>
+              <div className="skeleton" style={{ width: '350px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-3">
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+            </div>
+          </div>
+        </section>
+      ) : related.length > 0 ? (
         <section className="section">
           <motion.div className="container" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={staggerContainer}>
             <motion.div variants={fadeUp} className="section-head center">
@@ -110,9 +154,21 @@ export default function StoryDetail() {
             </motion.div>
           </motion.div>
         </section>
-      )}
+      ) : null}
 
-      {others.length > 0 && (
+      {allStoriesLoading ? (
+        <section className="section story-more">
+          <div className="container">
+            <div className="section-head">
+              <div className="skeleton" style={{ width: '250px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-2">
+              <div className="skeleton" style={{ height: '220px', borderRadius: 'var(--radius-lg)' }}></div>
+              <div className="skeleton" style={{ height: '220px', borderRadius: 'var(--radius-lg)' }}></div>
+            </div>
+          </div>
+        </section>
+      ) : others.length > 0 ? (
         <section className="section story-more">
           <motion.div className="container" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={staggerContainer}>
             <motion.div variants={fadeUp} className="section-head"><h2>Câu chuyện khác</h2></motion.div>
@@ -130,7 +186,7 @@ export default function StoryDetail() {
             </motion.div>
           </motion.div>
         </section>
-      )}
+      ) : null}
     </article>
   );
 }

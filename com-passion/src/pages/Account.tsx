@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth, badgeFor } from "../context/AuthContext";
 import { formatVND } from "../data/types";
-import { Loading } from "../components/Status";
 import AvatarUploader from "../components/AvatarUploader";
 import { api } from "../lib/api";
 import { SkeletonAccount } from "../components/Skeleton";
@@ -89,8 +88,12 @@ export default function Account() {
     setIsSaving(true);
     try {
       let finalAvatarUrl = user?.avatar || "";
-      
-      if (editAvatar && editAvatar !== user?.avatar && typeof editAvatar !== "string") {
+
+      if (
+        editAvatar &&
+        editAvatar !== user?.avatar &&
+        typeof editAvatar !== "string"
+      ) {
         try {
           const res = await api.uploadImage(editAvatar);
           finalAvatarUrl = res.url;
@@ -725,7 +728,10 @@ export default function Account() {
                   </motion.article>
                 ))}
                 {user.orders.length > 2 && (
-                  <motion.div variants={fadeUp} style={{ textAlign: "center", marginTop: "1rem" }}>
+                  <motion.div
+                    variants={fadeUp}
+                    style={{ textAlign: "center", marginTop: "1rem" }}
+                  >
                     <button
                       className="btn btn--outline interactive"
                       onClick={() => setShowAllOrders(!showAllOrders)}
@@ -733,10 +739,12 @@ export default function Account() {
                         background: "transparent",
                         borderColor: "var(--clay-500)",
                         color: "var(--clay-700)",
-                        padding: "0.5rem 1.5rem"
+                        padding: "0.5rem 1.5rem",
                       }}
                     >
-                      {showAllOrders ? "Thu gọn" : `Xem thêm ${user.orders.length - 2} đơn hàng cũ hơn`}
+                      {showAllOrders
+                        ? "Thu gọn"
+                        : `Xem thêm ${user.orders.length - 2} đơn hàng cũ hơn`}
                     </button>
                   </motion.div>
                 )}
@@ -863,196 +871,259 @@ export default function Account() {
                 onClick={(e) => e.stopPropagation()}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-              style={{
-                background: "var(--surface)",
-                padding: "1.5rem",
-                borderRadius: "var(--radius-lg)",
-                width: "100%",
-                maxWidth: "700px",
-                maxHeight: "96vh",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-              }}
-            >
-              <h2 style={{ marginBottom: "1rem", fontSize: "1.5rem" }}>
-                Chỉnh sửa hồ sơ
-              </h2>
-              {editError && (
-                <div
-                  style={{
-                    marginBottom: "1rem",
-                    padding: "1rem",
-                    background: "#fee2e2",
-                    color: "#991b1b",
-                    borderRadius: "var(--radius-sm)",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {editError}
-                </div>
-              )}
-
-              {editSuccess ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  style={{ textAlign: "center", padding: "3rem 1rem" }}
-                >
-                  <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>
-                    🌿
-                  </div>
-                  <h3
-                    style={{
-                      color: "var(--green-700)",
-                      fontSize: "1.5rem",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Đã cập nhật hồ sơ!
-                  </h3>
-                  <p className="muted">
-                    Những thay đổi của bạn đã được lưu lại.
-                  </p>
-                </motion.div>
-              ) : (
-                <form
-                  onSubmit={handleSaveProfile}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1rem",
-                    flex: 1,
-                    overflow: "hidden"
-                  }}
-                >
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1rem" }}>
-                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                        <label>
-                          <strong
-                            style={{ display: "block", marginBottom: "0.25rem", fontSize: "0.95rem" }}
-                          >
-                            Tên hiển thị
-                          </strong>
-                          <input
-                            className="input"
-                            type="text"
-                            required
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            disabled={isSaving}
-                            style={{
-                              opacity: isSaving ? 0.6 : 1,
-                            }}
-                          />
-                        </label>
-                        <h3
-                          style={{
-                            fontSize: "1rem",
-                            color: "var(--green-700)",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            margin: "0.5rem 0 0 0"
-                          }}
-                        >
-                          <ShieldCheck size={16} /> Bảo mật
-                        </h3>
-                      </div>
-                      
-                      <div style={{ marginTop: "auto", paddingTop: "0.5rem" }}>
-                        {!resetSent ? (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              setIsResetting(true);
-                              setEditError("");
-                              try {
-                                await resetPassword(user.email);
-                                setResetSent(true);
-                              } catch (err: any) {
-                                setEditError("Lỗi khi gửi email: " + err.message);
-                              } finally {
-                                setIsResetting(false);
-                              }
-                            }}
-                            disabled={isResetting || isSaving}
-                            className="btn btn--light interactive"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "0.5rem",
-                              padding: "0.6rem",
-                              width: "100%",
-                              background: "var(--cream)",
-                              border: "1px solid var(--border)",
-                              color: "var(--text)",
-                              fontWeight: 500,
-                              fontSize: "0.95rem",
-                              opacity: (isResetting || isSaving) ? 0.6 : 1,
-                              pointerEvents: (isResetting || isSaving) ? "none" : "auto",
-                            }}
-                          >
-                            {isResetting ? "Đang gửi..." : "Gửi email tạo mật khẩu mới"}
-                          </button>
-                        ) : (
-                          <div style={{ color: "var(--green-700)", fontSize: "0.9rem", display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem", background: "var(--green-50)", borderRadius: "var(--radius-sm)" }}>
-                            <CheckCircle size={16} /> Đã gửi email khôi phục!
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                      <strong style={{ display: "block", fontSize: "0.95rem" }}>
-                        Ảnh đại diện
-                      </strong>
-                      <AvatarUploader value={editAvatar} onChange={setEditAvatar} disabled={isSaving} />
-                    </div>
-                  </div>
-
+                exit={{
+                  opacity: 0,
+                  scale: 0.95,
+                  transition: { duration: 0.2 },
+                }}
+                style={{
+                  background: "var(--surface)",
+                  padding: "1.5rem",
+                  borderRadius: "var(--radius-lg)",
+                  width: "100%",
+                  maxWidth: "700px",
+                  maxHeight: "96vh",
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                }}
+              >
+                <h2 style={{ marginBottom: "1rem", fontSize: "1.5rem" }}>
+                  Chỉnh sửa hồ sơ
+                </h2>
+                {editError && (
                   <div
                     style={{
-                      display: "flex",
-                      gap: "1rem",
-                      marginTop: "auto",
-                      borderTop: "1px solid var(--border)",
-                      paddingTop: "1rem"
+                      marginBottom: "1rem",
+                      padding: "1rem",
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      borderRadius: "var(--radius-sm)",
+                      fontSize: "0.95rem",
                     }}
                   >
-                    <button
-                      type="button"
-                      className="btn interactive"
-                      onClick={() => setIsEditModalOpen(false)}
-                      disabled={isSaving}
+                    {editError}
+                  </div>
+                )}
+
+                {editSuccess ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ textAlign: "center", padding: "3rem 1rem" }}
+                  >
+                    <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>
+                      🌿
+                    </div>
+                    <h3
                       style={{
-                        flex: 1,
-                        background: "none",
-                        border: "1px solid var(--border)",
-                        color: "var(--text)",
-                        opacity: isSaving ? 0.6 : 1,
-                        pointerEvents: isSaving ? "none" : "auto",
+                        color: "var(--green-700)",
+                        fontSize: "1.5rem",
+                        marginBottom: "0.5rem",
                       }}
                     >
-                      Hủy bỏ
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn--accent interactive"
-                      disabled={isSaving}
-                      style={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}
+                      Đã cập nhật hồ sơ!
+                    </h3>
+                    <p className="muted">
+                      Những thay đổi của bạn đã được lưu lại.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <form
+                    onSubmit={handleSaveProfile}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1rem",
+                      flex: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fit, minmax(250px, 1fr))",
+                        gap: "1rem",
+                      }}
                     >
-                      {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </motion.div>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          height: "100%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          <label>
+                            <strong
+                              style={{
+                                display: "block",
+                                marginBottom: "0.25rem",
+                                fontSize: "0.95rem",
+                              }}
+                            >
+                              Tên hiển thị
+                            </strong>
+                            <input
+                              className="input"
+                              type="text"
+                              required
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              disabled={isSaving}
+                              style={{
+                                opacity: isSaving ? 0.6 : 1,
+                              }}
+                            />
+                          </label>
+                          <h3
+                            style={{
+                              fontSize: "1rem",
+                              color: "var(--green-700)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.5rem",
+                              margin: "0.5rem 0 0 0",
+                            }}
+                          >
+                            <ShieldCheck size={16} /> Bảo mật
+                          </h3>
+                        </div>
+
+                        <div
+                          style={{ marginTop: "auto", paddingTop: "0.5rem" }}
+                        >
+                          {!resetSent ? (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                setIsResetting(true);
+                                setEditError("");
+                                try {
+                                  await resetPassword(user.email);
+                                  setResetSent(true);
+                                } catch (err: any) {
+                                  setEditError(
+                                    "Lỗi khi gửi email: " + err.message,
+                                  );
+                                } finally {
+                                  setIsResetting(false);
+                                }
+                              }}
+                              disabled={isResetting || isSaving}
+                              className="btn btn--light interactive"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "0.5rem",
+                                padding: "0.6rem",
+                                width: "100%",
+                                background: "var(--cream)",
+                                border: "1px solid var(--border)",
+                                color: "var(--text)",
+                                fontWeight: 500,
+                                fontSize: "0.95rem",
+                                opacity: isResetting || isSaving ? 0.6 : 1,
+                                pointerEvents:
+                                  isResetting || isSaving ? "none" : "auto",
+                              }}
+                            >
+                              {isResetting
+                                ? "Đang gửi..."
+                                : "Gửi email tạo mật khẩu mới"}
+                            </button>
+                          ) : (
+                            <div
+                              style={{
+                                color: "var(--green-700)",
+                                fontSize: "0.9rem",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                padding: "0.6rem",
+                                background: "var(--green-50)",
+                                borderRadius: "var(--radius-sm)",
+                              }}
+                            >
+                              <CheckCircle size={16} /> Đã gửi email khôi phục!
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "0.25rem",
+                        }}
+                      >
+                        <strong
+                          style={{ display: "block", fontSize: "0.95rem" }}
+                        >
+                          Ảnh đại diện
+                        </strong>
+                        <AvatarUploader
+                          value={editAvatar}
+                          onChange={setEditAvatar}
+                          disabled={isSaving}
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "1rem",
+                        marginTop: "auto",
+                        borderTop: "1px solid var(--border)",
+                        paddingTop: "1rem",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        className="btn interactive"
+                        onClick={() => setIsEditModalOpen(false)}
+                        disabled={isSaving}
+                        style={{
+                          flex: 1,
+                          background: "none",
+                          border: "1px solid var(--border)",
+                          color: "var(--text)",
+                          opacity: isSaving ? 0.6 : 1,
+                          pointerEvents: isSaving ? "none" : "auto",
+                        }}
+                      >
+                        Hủy bỏ
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn--accent interactive"
+                        disabled={isSaving}
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>,

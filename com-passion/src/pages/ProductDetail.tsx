@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api, ApiError } from '../lib/api';
@@ -7,7 +7,7 @@ import { formatVND } from '../data/types';
 import { useCart } from '../context/CartContext';
 import Photo from '../components/Photo';
 import ProductCard from '../components/ProductCard';
-import { Loading, ErrorNote } from '../components/Status';
+import { ErrorNote } from '../components/Status';
 import { SkeletonProductDetail } from '../components/Skeleton';
 
 const fadeUp = {
@@ -38,7 +38,7 @@ export default function ProductDetail() {
     [slug]
   );
 
-  const { data: story } = useApi(
+  const { data: story, loading: storyLoading } = useApi(
     async () => {
       if (!product?.storySlug) return null;
       try {
@@ -50,7 +50,7 @@ export default function ProductDetail() {
     [product?.storySlug]
   );
 
-  const { data: related } = useApi(
+  const { data: related, loading: relatedLoading } = useApi(
     async () => {
       if (!product) return [];
       const list = await api.products({ category: product.category });
@@ -61,9 +61,46 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <section className="section section--top container">
-        <SkeletonProductDetail />
-      </section>
+      <motion.div initial="hidden" animate="visible" exit="hidden" variants={fadeUp}>
+        <section className="section section--top">
+          <div className="container">
+            <SkeletonProductDetail />
+          </div>
+        </section>
+
+        {/* Skeleton for Story */}
+        <section className="section pdp-story">
+          <div className="container">
+            <div className="pdp-story__inner" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+              <div>
+                <div className="skeleton" style={{ width: '100%', aspectRatio: '4/3', borderRadius: 'var(--radius-lg)' }}></div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="skeleton" style={{ width: '30%', height: '24px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '80%', height: '48px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '100%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '90%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '95%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '220px', height: '48px', borderRadius: 'var(--radius-pill)', marginTop: '1rem' }}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Skeleton for Related Products */}
+        <section className="section">
+          <div className="container">
+            <div className="section-head">
+              <div className="skeleton" style={{ width: '300px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-3">
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+            </div>
+          </div>
+        </section>
+      </motion.div>
     );
   }
 
@@ -167,7 +204,25 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      {story && (
+      {storyLoading ? (
+        <section className="section pdp-story">
+          <div className="container">
+            <div className="pdp-story__inner" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+              <div>
+                <div className="skeleton" style={{ width: '100%', aspectRatio: '4/3', borderRadius: 'var(--radius-lg)' }}></div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="skeleton" style={{ width: '30%', height: '24px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '80%', height: '48px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '100%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '90%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '95%', height: '20px', borderRadius: '4px' }}></div>
+                <div className="skeleton" style={{ width: '220px', height: '48px', borderRadius: 'var(--radius-pill)', marginTop: '1rem' }}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : story ? (
         <section className="section pdp-story">
           <div className="container">
             <motion.div 
@@ -194,9 +249,22 @@ export default function ProductDetail() {
             </motion.div>
           </div>
         </section>
-      )}
+      ) : null}
 
-      {related && related.length > 0 && (
+      {relatedLoading ? (
+        <section className="section">
+          <div className="container">
+            <div className="section-head">
+              <div className="skeleton" style={{ width: '300px', height: '36px', borderRadius: '4px' }}></div>
+            </div>
+            <div className="grid cols-3">
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+              <div className="skeleton card" style={{ height: '350px' }}></div>
+            </div>
+          </div>
+        </section>
+      ) : related && related.length > 0 ? (
         <section className="section">
           <div className="container">
             <motion.div 
@@ -216,7 +284,7 @@ export default function ProductDetail() {
             </motion.div>
           </div>
         </section>
-      )}
+      ) : null}
     </motion.div>
   );
 }

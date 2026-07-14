@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { formatVND } from '../data/types';
 import type { Report } from '../data/types';
 import './Invoice.css';

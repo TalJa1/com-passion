@@ -1,9 +1,9 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { api } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import Photo from "../components/Photo";
-import { Loading, ErrorNote } from "../components/Status";
+import { ErrorNote } from "../components/Status";
 import { SkeletonStory } from "../components/Skeleton";
 
 const fadeUp = {
@@ -72,7 +72,7 @@ export default function Stories() {
           {loading && (
             <div className="stories">
               <SkeletonStory />
-              <SkeletonStory />
+              <SkeletonStory isRev />
               <SkeletonStory />
             </div>
           )}

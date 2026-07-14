@@ -80,9 +80,9 @@ export function SkeletonProductDetail() {
   );
 }
 
-export function SkeletonStory() {
+export function SkeletonStory({ isRev = false }: { isRev?: boolean }) {
   return (
-    <div className="feature">
+    <div className={`feature ${isRev ? 'feature--rev' : ''}`}>
       <div className="feature__media">
         <SkeletonImage ratio="4 / 3" />
       </div>
